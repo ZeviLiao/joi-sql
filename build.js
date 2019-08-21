@@ -23,19 +23,19 @@ function decimalLessThan(precision) {
 }
 
 function unrollEnum(col) {
-	return col.columnType.match(/enum\((.+)\)/)[1]
+	return col.COLUMNTYPE.match(/enum\((.+)\)/)[1]
 }
 
 var checks = [
 
 	function intCheck(column) {
 		var checks = ''
-		if (maxIntValues[column.dataType]) {
+		if (maxIntValues[column.DATATYPE]) {
 			checks += '.number().integer()'
 
 			var min = 0
-			var max = maxIntValues[column.dataType]
-			if (column.columnType.indexOf('unsigned') === -1) {
+			var max = maxIntValues[column.DATATYPE]
+			if (column.COLUMNTYPE.indexOf('unsigned') === -1) {
 				max = getSignedValue(max)
 				min = -1 * (max + 1)
 			}
@@ -47,24 +47,24 @@ var checks = [
 	},
 
 	function dateCheck(column) {
-		return ifValThen(column, 'dataType', ['datetime', 'date', 'timestamp'], '.date()')
+		return ifValThen(column, 'DATATYPE', ['datetime', 'date', 'timestamp'], '.date()')
 	},
 
 	function stringCheck(column) {
-		return ifValThen(column, 'dataType', ['text', 'varchar', 'char'], '.string().max(' + column.characterMaximumLength + ')')
+		return ifValThen(column, 'DATATYPE', ['text', 'varchar', 'char'], '.string().max(' + column.CHARACTERMAXIMUMLENGTH + ')')
 	},
 
 	function boolCheck(column) {
-		return (column.dataType === 'bit' && column.numericPrecision == '1') ? '.boolean()' : ''
+		return (column.DATATYPE === 'bit' && column.numericPrecision == '1') ? '.boolean()' : ''
 	},
 
 	function decimalCheck(column) {
-		return ifValThen(column, 'dataType', 'decimal', '.number().precision('
+		return ifValThen(column, 'DATATYPE', 'decimal', '.number().precision('
 			+ column.numericScale + ').less(' + decimalLessThan(column.numericPrecision - column.numericScale) + ')')
 	},
 
 	function enumCheck(column) {
-		if (column.dataType === 'enum') {
+		if (column.DATATYPE === 'enum') {
 			return '.any().valid(' + unrollEnum(column) + ')'
 		}
 		return ''
@@ -82,7 +82,7 @@ var checks = [
 
 module.exports = function(columns, camelCaseProperties) {
 	return 'Joi.object({\n\t' + columns.map(function(column) {
-		var property = camelCaseProperties ? toCamelCase(column.columnName) : column.columnName
+		var property = camelCaseProperties ? toCamelCase(column.COLUMNNAME) : column.COLUMNNAME
 		return property + ': Joi' + checks.map(function(check) {
 			return check(column)
 		}).join('')
