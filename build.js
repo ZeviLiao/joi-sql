@@ -55,12 +55,12 @@ var checks = [
 	},
 
 	function boolCheck(column) {
-		return (column.DATATYPE === 'bit' && column.numericPrecision == '1') ? '.boolean()' : ''
+		return (column.DATATYPE === 'bit' && column.NUMERICPRECISION == '1') ? '.boolean()' : ''
 	},
 
 	function decimalCheck(column) {
 		return ifValThen(column, 'DATATYPE', 'decimal', '.number().precision('
-			+ column.numericScale + ').less(' + decimalLessThan(column.numericPrecision - column.numericScale) + ')')
+			+ column.NUMERICSCALE + ').less(' + decimalLessThan(column.NUMERICPRECISION - column.NUMERICSCALE) + ')')
 	},
 
 	function enumCheck(column) {
@@ -71,10 +71,12 @@ var checks = [
 	},
 
 	function nullableCheck(column) {
-		if (column.isNullable === 'YES') {
-			return '.allow(null)'
-		} else if (column.isNullable === 'NO') {
-			return '.invalid(null)'
+		if (column.ISNULLABLE === 'YES') {
+			// return '.allow(null)'
+			return ''
+		} else if (column.ISNULLABLE === 'NO') {
+			// return '.invalid(null)'
+			return '.required()'
 		}
 	}
 
